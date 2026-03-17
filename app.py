@@ -181,6 +181,16 @@ def deletar_economia(id):
         db.session.delete(eco); db.session.commit()
     return redirect(url_for('economias'))
 
+@app.route('/admin_painel')
+@login_required
+def admin_painel():
+    if current_user.username != 'Milena': 
+        return "<h1>Acesso Proibido</h1><p>Você não tem permissão de administrador.</p>", 403
+
+    usuarios = User.query.order_by(User.id.desc()).all()
+    total_gastos = Gasto.query.count()
+    return render_template('admin.html', usuarios=usuarios, total_gastos=total_gastos)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

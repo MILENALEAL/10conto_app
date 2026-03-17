@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-body">
+    <div class="main-wrapper" style="display: block; padding: 20px;">
+        <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+            <h1 style="color: var(--text-main); margin-bottom: 10px;">👑 Painel de Controle</h1>
+            <p style="color: var(--text-dim); margin-bottom: 25px;">Gerenciamento de usuários e sistema.</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                <div style="background: #1e293b; padding: 15px; border-radius: 12px; text-align: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">Total de Usuários</span>
+                    <h2 style="color: var(--accent);">{{ usuarios|length }}</h2>
+                </div>
+                <div style="background: #1e293b; padding: 15px; border-radius: 12px; text-align: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">Lançamentos Totais</span>
+                    <h2 style="color: var(--danger);">{{ total_gastos }}</h2>
+                </div>
+            </div>
+
+            <div class="chat-container" style="background: rgba(0,0,0,0.2);">
+                <h3 style="margin-bottom: 15px;">Lista de Usuários</h3>
+                {% for u in usuarios %}
+                <div style="display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: var(--text-main);">#{{ u.id }} - <b>{{ u.username }}</b></span>
+                    <span style="color: var(--text-dim); font-size: 0.8rem;">Ativo</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="auth-footer" style="margin-top: 30px;">
+                <a href="/dashboard" class="auth-link">← Voltar para o App</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
