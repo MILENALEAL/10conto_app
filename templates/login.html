@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Finanças</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="tela-central">
+        <div class="caixa-login">
+            <h2>App de Finanças</h2>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <p style="color: #e74c3c; font-size: 14px;"><b>{{ message }}</b></p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/login">
+                <input type="text" name="usuario" placeholder="Seu Usuário" required>
+                <input type="password" name="senha" placeholder="Sua Senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <br><br>
+            <a href="/registro" class="link-simples">Não tem conta? Cadastre-se aqui</a>
+        </div>
+    </div>
+</body>
+</html>

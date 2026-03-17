@@ -1,0 +1,98 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    height: 100vh;
+}
+
+.tela-central {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.caixa-login {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 300px;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+.menu-lateral {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.menu-lateral h2 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.menu-lateral a {
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #34495e;
+    transition: 0.3s;
+}
+
+.menu-lateral a:hover {
+    background-color: #6c63ff;
+}
+
+.conteudo-principal {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+button {
+    background-color: #6c63ff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #574b90;
+}
+
+.link-simples {
+    text-decoration: none;
+    color: #6c63ff;
+    font-size: 14px;
+}
+
+.link-simples:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Extrato - Finanças</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn-apagar {
+            background-color: #e74c3c;
+            padding: 6px 10px;
+            font-size: 12px;
+            width: auto;
+            margin: 0;
+        }
+        .btn-apagar:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="menu-lateral">
+            <h2>App Finanças</h2>
+            <a href="/dashboard">💬 Chat de Lançamento</a>
+            <a href="/extrato" style="background-color: #6c63ff;">📋 Extrato de Gastos</a>
+            <a href="/economias">💰 Minhas Economias</a>
+            <a href="/logout" style="margin-top: auto; background-color: #e74c3c;">Sair da Conta</a>
+        </div>
+
+        <div class="conteudo-principal">
+            <h2>Extrato Detalhado</h2>
+            <h3 style="color: #e74c3c;">Total Gasto: R$ {{ "%.2f"|format(total) }}</h3>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <p style="color: #27ae60; font-size: 14px;"><b>{{ message }}</b></p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Valor (R$)</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for gasto in gastos %}
+                        <tr>
+                            <td>{{ gasto.descricao }}</td>
+                            <td>{{ "%.2f"|format(gasto.valor) }}</td>
+                            <td>
+                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;">
+                                    <button type="submit" class="btn-apagar">Apagar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #888;">Nenhum gasto registrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

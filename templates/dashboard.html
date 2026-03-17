@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel - Finanças</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <div class="menu-lateral">
+            <h2>App Finanças</h2>
+            <a href="/dashboard">💬 Chat de Lançamento</a>
+            <a href="/extrato">📋 Extrato de Gastos</a>
+            <a href="/economias">💰 Minhas Economias</a>
+            <a href="/logout" style="margin-top: auto; background-color: #e74c3c;">Sair da Conta</a>
+        </div>
+
+        <div class="conteudo-principal">
+            <h2>Olá, {{ current_user.username }}!</h2>
+            <h3 style="color: #e74c3c;">Total Gasto: R$ {{ "%.2f"|format(total) }}</h3>
+            
+            <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin-top: 20px;">
+                
+                <div style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #fafafa;">
+                    {% for gasto in gastos %}
+                        <p style="margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                            <b>{{ gasto.descricao }}:</b> R$ {{ "%.2f"|format(gasto.valor) }}
+                        </p>
+                    {% else %}
+                        <p style="color: #888; text-align: center; margin-top: 120px;">Nenhum gasto registrado ainda.</p>
+                    {% endfor %}
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <p style="color: #e74c3c; font-size: 14px;"><b>{{ message }}</b></p>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/dashboard" style="display: flex; gap: 10px;">
+                    <input type="text" name="mensagem" placeholder="Ex: Alimentação 24,50" required autocomplete="off" style="margin: 0;">
+                    <button type="submit" style="width: auto; white-space: nowrap;">Enviar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

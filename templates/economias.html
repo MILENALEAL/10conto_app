@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Economias - Finanças</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <div class="menu-lateral">
+            <h2>App Finanças</h2>
+            <a href="/dashboard">💬 Chat de Lançamento</a>
+            <a href="/extrato">📋 Extrato de Gastos</a>
+            <a href="/economias" style="background-color: #27ae60;">💰 Minhas Economias</a>
+            <a href="/logout" style="margin-top: auto; background-color: #e74c3c;">Sair da Conta</a>
+        </div>
+
+        <div class="conteudo-principal">
+            <h2>O meu Porquinho 🐷</h2>
+            <h3 style="color: #27ae60;">Total Poupado: R$ {{ "%.2f"|format(total_economias) }}</h3>
+            
+            <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin-top: 20px;">
+                
+                <div style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #eafaf1;">
+                    {% for economia in economias %}
+                        <p style="margin: 5px 0; border-bottom: 1px solid #cceee0; padding-bottom: 10px;">
+                            <b>{{ economia.descricao }}:</b> R$ {{ "%.2f"|format(economia.valor) }}
+                        </p>
+                    {% else %}
+                        <p style="color: #888; text-align: center; margin-top: 120px;">Nenhuma economia registada ainda.</p>
+                    {% endfor %}
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <p style="color: #e74c3c; font-size: 14px;"><b>{{ message }}</b></p>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/economias" style="display: flex; gap: 10px;">
+                    <input type="text" name="mensagem" placeholder="Ex: Poupança 100,00" required autocomplete="off" style="margin: 0;">
+                    <button type="submit" style="width: auto; white-space: nowrap; background-color: #27ae60;">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
