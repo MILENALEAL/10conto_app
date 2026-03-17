@@ -2,49 +2,97 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Economias - Finanças</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Minhas Metas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="app-container">
-        <div class="menu-lateral">
-            <h2>App Finanças</h2>
-            <a href="/dashboard">💬 Chat de Lançamento</a>
-            <a href="/extrato">📋 Extrato de Gastos</a>
-            <a href="/economias" style="background-color: #27ae60;">💰 Minhas Economias</a>
-            <a href="/logout" style="margin-top: auto; background-color: #e74c3c;">Sair da Conta</a>
-        </div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-        <div class="conteudo-principal">
-            <h2>O meu Porquinho 🐷</h2>
-            <h3 style="color: #27ae60;">Total Poupado: R$ {{ "%.2f"|format(total_economias) }}</h3>
-            
-            <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin-top: 20px;">
-                
-                <div style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #eafaf1;">
-                    {% for economia in economias %}
-                        <p style="margin: 5px 0; border-bottom: 1px solid #cceee0; padding-bottom: 10px;">
-                            <b>{{ economia.descricao }}:</b> R$ {{ "%.2f"|format(economia.valor) }}
-                        </p>
-                    {% else %}
-                        <p style="color: #888; text-align: center; margin-top: 120px;">Nenhuma economia registada ainda.</p>
-                    {% endfor %}
+    <div class="main-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><h2>💰 10Conto</h2></div>
+            <nav>
+                <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
+                <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
+                <a href="/tabelas" class="nav-link">📊 Tabelas por Categoria</a>
+                <a href="/economias" class="nav-link active">🏦 Minhas Economias</a>
+                <div class="sidebar-footer">
+                    <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
                 </div>
+            </nav>
+        </aside>
 
-                {% with messages = get_flashed_messages() %}
-                  {% if messages %}
-                    {% for message in messages %}
-                      <p style="color: #e74c3c; font-size: 14px;"><b>{{ message }}</b></p>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
+        <main class="content">
+            <header class="content-header">
+                <h1>Minha Economias</h1>
+                <div class="total-card eco-card">
+                    <span>Saldo Total Guardado</span>
+                    <h2 class="valor-gasto">R$ {{ "%.2f"|format(total_economias) }}</h2>
+                </div>
+            </header>
 
-                <form method="POST" action="/economias" style="display: flex; gap: 10px;">
-                    <input type="text" name="mensagem" placeholder="Ex: Poupança 100,00" required autocomplete="off" style="margin: 0;">
-                    <button type="submit" style="width: auto; white-space: nowrap; background-color: #27ae60;">Guardar</button>
+            {% if economias %}
+            <div class="chat-container" style="margin-bottom: 20px; border-left: 5px solid var(--success);">
+                <h3 style="margin-bottom: 15px;">📥 Guardar Dinheiro</h3>
+                <form method="POST" class="input-group">
+                    <select name="meta_id" style="flex: 1; background: #334155; color: white; border: 1px solid #475569; padding: 10px; border-radius: 12px;">
+                        {% for eco in economias %}
+                            <option value="{{ eco.id }}">{{ eco.descricao }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="valor_add" placeholder="Quanto? (Ex: 100)" required style="flex: 1;">
+                    <button type="submit" name="btn_adicionar" class="btn-enviar" style="background: var(--success);">Guardar</button>
                 </form>
             </div>
-        </div>
+            {% endif %}
+
+            <div class="lista-economias">
+                {% for eco in economias %}
+                    <div class="eco-item" style="background: #334155; padding: 20px; border-radius: 16px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <span style="font-size: 1.1rem;"><strong>{{ eco.descricao }}</strong></span>
+                                <div style="margin-top: 4px;">
+                                    <span style="color: var(--success); font-weight: 700;">R$ {{ "%.2f"|format(eco.valor) }}</span>
+                                    {% if eco.valor_meta > 0 %}
+                                        <span style="color: var(--text-dim); font-size: 0.8rem;"> de R$ {{ "%.2f"|format(eco.valor_meta) }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <form method="POST" action="/deletar_economia/{{ eco.id }}">
+                                <button type="submit" class="btn-delete">🗑️</button>
+                            </form>
+                        </div>
+
+                        {% if eco.valor_meta > 0 %}
+                            {% set calculo = (eco.valor / eco.valor_meta * 100)|int %}
+                            {% if calculo > 100 %}{% set calculo = 100 %}{% endif %}
+                            
+                            <div class="progress-track" style="background: #1e293b; height: 10px; border-radius: 5px; margin-top: 10px;">
+                                <div class="progress-fill" style="width: {{ calculo }}%; background: var(--success); height: 100%; border-radius: 5px;"></div>
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 5px;">{{ calculo }}% alcançado</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p style="text-align: center; color: var(--text-dim);">Crie sua primeira meta abaixo! 👇</p>
+                {% endfor %}
+            </div>
+
+            <div class="chat-container" style="margin-top: 20px; background: rgba(99, 102, 241, 0.1);">
+                <h3 style="margin-bottom: 15px; color: var(--accent);">🎯 Novo Objetivo</h3>
+                <form method="POST" style="display: flex; gap: 10px; flex-direction: column;">
+                    <input type="text" name="nome_meta" placeholder="Nome (Ex: Viagem)" required>
+                    <input type="text" name="valor_meta" placeholder="Valor da Meta (Ex: 5000)" required>
+                    <button type="submit" name="btn_criar" class="btn-enviar" style="width: 100%; padding: 12px;">Criar Meta</button>
+                </form>
+            </div>
+        </main>
     </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+    </script>
 </body>
 </html>

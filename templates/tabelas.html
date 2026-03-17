@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Tabelas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+    <div class="main-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><h2>💰 10Conto</h2></div>
+            <nav>
+                <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
+                <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
+                <a href="/tabelas" class="nav-link active">📊 Tabelas por Categoria</a>
+                <a href="/economias" class="nav-link">🏦 Minhas Economias</a>
+                <div class="sidebar-footer">
+                    <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1 style="margin-bottom: 5px;">Resumo por Categoria</h1>
+                    <p style="color: var(--text-dim); margin-bottom: 30px">Veja onde você mais gastou</p>
+                </div>
+
+<form method="GET" action="/tabelas" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px;">                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
+                    <select name="mes" id="mes" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer; padding-right: 5px;">
+                        {% for num, nome in meses.items() %}
+                            <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %} style="background: #1e293b; color: white;">
+                                {{ nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </header>
+
+            {% if resumo %}
+            <div class="chat-container" style="max-width: 450px; margin: 0 auto 30px auto; padding: 30px; display: flex; justify-content: center;">
+                <canvas id="meuGrafico"></canvas>
+            </div>
+            {% endif %}
+
+            <div class="grid-tabelas">
+                {% for cat, total in resumo %}
+                <div class="card-categoria {{ cat.lower() }}">
+                    <div class="card-info">
+                        <h3>
+                            {% if cat == 'Alimentação' %}🍔
+                            {% elif cat == 'Transporte' %}🚗
+                            {% elif cat == 'Casa' %}🏠
+                            {% elif cat == 'Lazer' %}🎉
+                            {% elif cat == 'Assinaturas' %}🍿
+                            {% else %}💡{% endif %}
+                            {{ cat }}
+                        </h3>
+                        <p class="valor-total">R$ {{ "%.2f"|format(total) }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="chat-container" style="text-align: center; padding: 50px; width: 100%;">
+                    <p style="color: var(--text-dim);">Nenhum gasto categorizado no mês de {{ meses[mes_atual] }}.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        {% if resumo %}
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('meuGrafico').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ labels|tojson }},
+                    datasets: [{
+                        data: {{ valores|tojson }},
+                        backgroundColor: [
+                            '#fbbf24', '#60a5fa', '#f472b6', '#a78bfa', '#f87171', '#10b981', '#94a3b8'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#f8fafc',
+                                padding: 20,
+                                font: { family: 'Inter', size: 13 }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

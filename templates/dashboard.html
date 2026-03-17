@@ -2,49 +2,101 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel - Finanças</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="app-container">
-        <div class="menu-lateral">
-            <h2>App Finanças</h2>
-            <a href="/dashboard">💬 Chat de Lançamento</a>
-            <a href="/extrato">📋 Extrato de Gastos</a>
-            <a href="/economias">💰 Minhas Economias</a>
-            <a href="/logout" style="margin-top: auto; background-color: #e74c3c;">Sair da Conta</a>
-        </div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-        <div class="conteudo-principal">
-            <h2>Olá, {{ current_user.username }}!</h2>
-            <h3 style="color: #e74c3c;">Total Gasto: R$ {{ "%.2f"|format(total) }}</h3>
-            
-            <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin-top: 20px;">
-                
-                <div style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #fafafa;">
+    <div class="main-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>💰 10Conto</h2>
+            </div>
+            <nav>
+                <a href="/dashboard" class="nav-link active">💬 Chat de Lançamento</a>
+                <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
+                <a href="/tabelas" class="nav-link">📊 Tabelas por Categoria</a> 
+                <a href="/economias" class="nav-link">🏦 Minhas Economias</a>
+                <div class="sidebar-footer">
+                    <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1 style="margin-bottom: 5px;">Olá, {{ current_user.username }}!</h1>
+                    <p style="color: var(--text-dim); margin-bottom: 25px;">O que você gastou hoje?</p>
+                </div>
+
+                <form method="GET" action="/dashboard" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
+                    <select name="mes" id="mes" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer; padding-right: 5px;">
+                        {% for num, nome in meses.items() %}
+                            <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %} style="background: #1e293b; color: white;">
+                                {{ nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <div class="total-card" style="width: 100%;">
+                    <span>Total Gasto em {{ meses[mes_atual] }}</span>
+                    <h2 class="valor-gasto">R$ {{ "%.2f"|format(total) }}</h2>
+                </div>
+            </header>
+
+            <div class="chat-container">
+                <div class="chat-box">
                     {% for gasto in gastos %}
-                        <p style="margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                            <b>{{ gasto.descricao }}:</b> R$ {{ "%.2f"|format(gasto.valor) }}
-                        </p>
+                        <div class="mensagem-gasto">
+                            <span class="desc">{{ gasto.descricao }}</span>
+                            <span class="valor">R$ {{ "%.2f"|format(gasto.valor) }}</span>
+                        </div>
                     {% else %}
-                        <p style="color: #888; text-align: center; margin-top: 120px;">Nenhum gasto registrado ainda.</p>
+                        <div class="empty-state" style="text-align: center; padding-top: 100px; color: var(--text-dim);">
+                            <p>Nenhum gasto registrado em {{ meses[mes_atual] }}.<br>Tente digitar: "Lanche 20,00"</p>
+                        </div>
                     {% endfor %}
                 </div>
 
+                <form method="POST" action="/dashboard" class="input-group">
+                    <input type="text" name="mensagem" placeholder="Ex: Mercado 150,00" required autocomplete="off">
+                    <button type="submit" class="btn-enviar">Enviar</button>
+                </form>
+
                 {% with messages = get_flashed_messages() %}
-                  {% if messages %}
-                    {% for message in messages %}
-                      <p style="color: #e74c3c; font-size: 14px;"><b>{{ message }}</b></p>
-                    {% endfor %}
-                  {% endif %}
+                    {% if messages %}
+                        <div style="margin-top: 15px;">
+                        {% for message in messages %}
+                            <p style="color: var(--danger); font-size: 0.9rem;">{{ message }}</p>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
                 {% endwith %}
 
-                <form method="POST" action="/dashboard" style="display: flex; gap: 10px;">
-                    <input type="text" name="mensagem" placeholder="Ex: Alimentação 24,50" required autocomplete="off" style="margin: 0;">
-                    <button type="submit" style="width: auto; white-space: nowrap;">Enviar</button>
-                </form>
+                <div class="categoria-guia" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 20px;">Categorias sugeridas:</h3>
+                    <div class="tags">
+                        <span class="tag">🍔 Alimentação</span>
+                        <span class="tag">🚗 Transporte</span>
+                        <span class="tag">🏠 Casa</span>
+                        <span class="tag">🎉 Lazer</span>
+                        <span class="tag">🍿 Assinaturas</span>
+                        <span class="tag">💡 Outros</span>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
 </body>
 </html>

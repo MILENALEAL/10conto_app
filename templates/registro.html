@@ -2,21 +2,56 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro - Finanças</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Criar Conta</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="tela-central">
-        <div class="caixa-login">
-            <h2>Criar Nova Conta</h2>
+<body class="auth-body">
+    <div class="auth-container">
+        
+        <div class="auth-card">
+            <div style="margin-bottom: 1rem;">
+                <h1 style="font-size: 2rem; color: var(--text-main); margin-bottom: 5px;">
+                    📝<span style="margin-left: 4px;">Nova Conta</span>
+                </h1>
+                <p style="color: var(--text-dim); font-size: 0.95rem; font-weight: 400;">
+                    Comece a organizar seu dinheiro.
+                </p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="flash-messages">
+                  {% for message in messages %}
+                    <p class="flash-msg" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem;"><b>{{ message }}</b></p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
             <form method="POST" action="/registro">
-                <input type="text" name="usuario" placeholder="Escolha um Usuário" required>
-                <input type="password" name="senha" placeholder="Escolha uma Senha" required>
-                <button type="submit">Cadastrar</button>
+                <div class="auth-fields-stack">
+                    <div class="input-group-auth">
+                        <input type="text" name="usuario" placeholder="Escolha um Usuário" required autocomplete="off">
+                    </div>
+                    <div class="input-group-auth">
+                        <input type="password" name="senha" placeholder="Crie uma Senha" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-enviar" style="margin-top: 10px;">
+                        Cadastrar
+                    </button>
+                </div>
             </form>
-            <br><br>
-            <a href="/" class="link-simples">Já tenho conta (Fazer Login)</a>
+
+            <div class="auth-footer">
+                <a href="/login" class="auth-link" style="margin-top: 1.5rem;">Já tenho conta (Fazer Login)</a>
+            </div>
         </div>
+        <p style="text-align: center; color: var(--text-dim); opacity: 0.5; font-size: 0.75rem; margin-top: 1.5rem; letter-spacing: 0.5px;">
+            Desenvolvido por Milena Leal • Versão 2.0
+        </p>
+
     </div>
 </body>
 </html>

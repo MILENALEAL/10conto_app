@@ -2,30 +2,58 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Finanças</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="tela-central">
-        <div class="caixa-login">
-            <h2>App de Finanças</h2>
+<body class="auth-body">
+    <div class="auth-container">
+        
+        <div class="auth-card">
+            
+            <div style="margin-bottom: 1rem;">
+                <h1 style="font-size: 2.5rem; color: var(--text-main); margin-bottom: 5px;">
+                    💰<span style="margin-left: 3px;">10</span><span style="color: var(--accent);">Conto</span>
+                </h1>
+                <p style="color: var(--text-dim); font-size: 0.95rem; font-weight: 400;">
+                    Organize seu dinheiro de forma simples.
+                </p>
+            </div>
 
             {% with messages = get_flashed_messages() %}
               {% if messages %}
-                {% for message in messages %}
-                  <p style="color: #e74c3c; font-size: 14px;"><b>{{ message }}</b></p>
-                {% endfor %}
+                <div class="flash-messages">
+                  {% for message in messages %}
+                    <p class="flash-msg" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem;"><b>{{ message }}</b></p>
+                  {% endfor %}
+                </div>
               {% endif %}
             {% endwith %}
 
             <form method="POST" action="/login">
-                <input type="text" name="usuario" placeholder="Seu Usuário" required>
-                <input type="password" name="senha" placeholder="Sua Senha" required>
-                <button type="submit">Entrar</button>
+                <div class="auth-fields-stack">
+                    <div class="input-group-auth">
+                        <input type="text" name="usuario" placeholder="Seu Usuário" required autocomplete="off">
+                    </div>
+                    <div class="input-group-auth">
+                        <input type="password" name="senha" placeholder="Sua Senha" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-enviar" style="margin-top: 10px;">
+                        Entrar
+                    </button>
+                </div>
             </form>
-            <br><br>
-            <a href="/registro" class="link-simples">Não tem conta? Cadastre-se aqui</a>
+
+            <div class="auth-footer">
+                <a href="/registro" class="auth-link" style="margin-top: 1.5rem;">Não tem conta? Cadastre-se aqui</a>
+            </div>
+            
         </div>
+        <p style="text-align: center; color: var(--text-dim); opacity: 0.5; font-size: 0.75rem; margin-top: 1.5rem; letter-spacing: 0.5px;">
+            Desenvolvido por Milena Leal • Versão 2.0
+        </p>
+
     </div>
 </body>
 </html>

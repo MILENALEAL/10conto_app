@@ -2,85 +2,112 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Extrato - Finanças</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10Conto - Extrato</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .btn-apagar {
-            background-color: #e74c3c;
-            padding: 6px 10px;
-            font-size: 12px;
-            width: auto;
-            margin: 0;
-        }
-        .btn-apagar:hover {
-            background-color: #c0392b;
-        }
-    </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="menu-lateral">
-            <h2>App Finanças</h2>
-            <a href="/dashboard">💬 Chat de Lançamento</a>
-            <a href="/extrato" style="background-color: #6c63ff;">📋 Extrato de Gastos</a>
-            <a href="/economias">💰 Minhas Economias</a>
-            <a href="/logout" style="margin-top: auto; background-color: #e74c3c;">Sair da Conta</a>
-        </div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-        <div class="conteudo-principal">
-            <h2>Extrato Detalhado</h2>
-            <h3 style="color: #e74c3c;">Total Gasto: R$ {{ "%.2f"|format(total) }}</h3>
+    <div class="main-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>💰 10Conto</h2>
+            </div>
+            <nav>
+                <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
+                <a href="/extrato" class="nav-link active">📋 Extrato de Gastos</a>
+                <a href="/tabelas" class="nav-link">📊 Tabelas por Categoria</a>
+                <a href="/economias" class="nav-link">🏦 Minhas Economias</a>
+                <div class="sidebar-footer">
+                    <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1 style="margin-bottom: 5px;">Extrato Detalhado</h1>
+                    <p style="color: var(--text-dim); margin-bottom: 25px;">Gerencie seus lançamentos do mês</p>
+                </div>
+
+<form method="GET" action="/extrato" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px;">                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
+                    <select name="mes" id="mes" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer; padding-right: 5px;">
+                        {% for num, nome in meses.items() %}
+                            <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %} style="background: #1e293b; color: white;">
+                                {{ nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </header>
+            
+            <div class="chat-container" style="margin-bottom: 30px; border-left: 5px solid var(--accent);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                    <span style="font-weight: 600; font-size: 1.1rem;">Limite Mensal</span>
+                    <span style="color: var(--text-dim); font-size: 0.9rem;">Meta: R$ {{ "%.2f"|format(meta) }}</span>
+                </div>
+                
+                <h2 class="valor-gasto" style="margin-bottom: 15px;">Gastos: R$ {{ "%.2f"|format(total) }}</h2>
+                
+                <div class="progress-track" style="background: #1e293b; height: 12px; border-radius: 6px;">
+                    <div class="progress-fill {% if porcentagem > 90 %}fill-danger{% elif porcentagem > 75 %}fill-warning{% else %}fill-success{% endif %}" 
+                            style="width: {{ porcentagem }}%; height: 100%; border-radius: 6px;">
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                    <small style="color: var(--text-dim);">{{ "%.0f"|format(porcentagem) }}% consumido</small>
+                    
+                    <form method="POST" style="display: flex; gap: 5px;">
+                        <input type="number" name="nova_meta" placeholder="Mudar limite" required style="padding: 4px 8px; font-size: 0.8rem; width: 120px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px;">
+                        <button type="submit" class="btn-enviar" style="padding: 4px 10px; font-size: 0.8rem;">Salvar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <h3 style="margin-bottom: 20px;">Histórico de Transações</h3>
+                <div class="lista-extrato">
+                    {% for gasto in gastos %}
+                        <div class="item-extrato" style="background: #334155; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div class="info" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="desc" style="font-weight: 600; font-size: 1.05rem;">{{ gasto.descricao }}</span>
+                                <span style="font-size: 0.8rem; color: var(--text-dim); background: #1e293b; padding: 2px 8px; border-radius: 10px; width: fit-content;">{{ gasto.categoria }}</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span class="valor-item" style="font-weight: 700; color: var(--danger);">R$ {{ "%.2f"|format(gasto.valor) }}</span>
+                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;" onsubmit="return confirm('Deseja apagar este gasto?')">
+                                    <button type="submit" class="btn-delete" title="Apagar lançamento" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; padding-top: 2px;">
+                                        🗑️
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+                            <p>Nenhum gasto encontrado no histórico de {{ meses[mes_atual] }}.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
 
             {% with messages = get_flashed_messages() %}
               {% if messages %}
-                {% for message in messages %}
-                  <p style="color: #27ae60; font-size: 14px;"><b>{{ message }}</b></p>
-                {% endfor %}
+                <div style="margin-top: 20px;">
+                  {% for message in messages %}
+                    <p class="flash-msg" style="color: #10b981;">{{ message }}</p>
+                  {% endfor %}
+                </div>
               {% endif %}
             {% endwith %}
-
-            <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Descrição</th>
-                            <th>Valor (R$)</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for gasto in gastos %}
-                        <tr>
-                            <td>{{ gasto.descricao }}</td>
-                            <td>{{ "%.2f"|format(gasto.valor) }}</td>
-                            <td>
-                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;">
-                                    <button type="submit" class="btn-apagar">Apagar</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="3" style="text-align: center; color: #888;">Nenhum gasto registrado.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </main>
     </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+    </script>
 </body>
 </html>
