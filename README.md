@@ -17,11 +17,3 @@ Um web app simples e direto ao ponto para organizar as finanças pessoais. Criei
 * **Autenticação:** Flask-Login
 * **Front-end:** HTML5, CSS3 puro e Jinja2 (100% responsivo para funcionar bem no celular)
 * **Hospedagem:** PythonAnywhere
-
-## 💻 Como rodar o projeto
-
-Se você quiser baixar e testar o 10Conto no seu computador, siga os passos:
-
-1. Clone este repositório:
-   ```bash
-   git clone [https://github.com/MILENALEAL/10conto_app.git](https://github.com/MILENALEAL/10conto_app.git)
