@@ -1,7 +1,7 @@
 {
   "name": "10Conto",
   "short_name": "10Conto",
-  "start_url": "/login",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
