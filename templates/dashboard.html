@@ -31,7 +31,6 @@
 
         <main class="content">
             <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
                     <div>
@@ -67,9 +66,29 @@
             <div class="chat-container">
                 <div class="chat-box">
                     {% for gasto in gastos %}
-                        <div class="mensagem-gasto">
-                            <span class="desc">{{ gasto.descricao }}</span>
-                            <span class="valor">R$ {{ "%.2f"|format(gasto.valor) }}</span>
+                        <div class="mensagem-gasto" style="flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                                <span class="desc" style="word-break: break-word; flex: 1;">{{ gasto.descricao }}</span>
+                                <span class="valor" style="white-space: nowrap;">R$ {{ "%.2f"|format(gasto.valor) }}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;" onsubmit="return confirm('Deseja apagar APENAS este lançamento?')">
+                                    <input type="hidden" name="tipo_exclusao" value="unica">
+                                    <button type="submit" style="background: #475569; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">
+                                        Apagar parcela
+                                    </button>
+                                </form>
+                                
+                                {% if gasto.compra_id %}
+                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;" onsubmit="return confirm('Deseja apagar esta e TODAS AS PARCELAS FUTURAS desta compra?')">
+                                    <input type="hidden" name="tipo_exclusao" value="futuras">
+                                    <button type="submit" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">
+                                        Apagar série
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
                         </div>
                     {% else %}
                         <div class="empty-state" style="text-align: center; padding-top: 100px; color: var(--text-dim);">

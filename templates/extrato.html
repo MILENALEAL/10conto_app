@@ -37,7 +37,7 @@
                     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">Extrato Detalhado</h1>
-                        <p style="color: var(--text-dim); margin-bottom: 15px;">Gerencie seus lançamentos do mês</p>
+                        <p style="color: var(--text-dim); margin-bottom: 15px;">Gerencie seus lançamentos</p>
                     </div>
                 </div>
 
@@ -88,25 +88,38 @@
                 <h3 style="margin-bottom: 20px;">Histórico de Transações</h3>
                 <div class="lista-extrato">
                     {% for gasto in gastos %}
-                        <div class="item-extrato" style="background: #334155; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <div class="info" style="display: flex; flex-direction: column; gap: 4px;">
-                                <span class="desc" style="font-weight: 600; font-size: 1.05rem;">{{ gasto.descricao }}</span>
-                                <span style="font-size: 0.8rem; color: var(--text-dim); background: #1e293b; padding: 2px 8px; border-radius: 10px; width: fit-content;">{{ gasto.categoria }}</span>
-                            </div>
+                    <div class="item-extrato" style="background: #334155; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div class="info" style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 150px;">
+                            <span class="desc" style="font-weight: 600; font-size: 1.05rem;">{{ gasto.descricao }}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-dim); background: #1e293b; padding: 2px 8px; border-radius: 10px; width: fit-content;">{{ gasto.categoria }}</span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: flex-end;">
+                            <span class="valor-item" style="font-weight: 700; color: var(--danger);">R$ {{ "%.2f"|format(gasto.valor) }}</span>
                             
-                            <div style="display: flex; align-items: center; gap: 15px;">
-                                <span class="valor-item" style="font-weight: 700; color: var(--danger);">R$ {{ "%.2f"|format(gasto.valor) }}</span>
-                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;" onsubmit="return confirm('Deseja apagar este gasto?')">
-                                    <button type="submit" class="btn-delete" title="Apagar lançamento" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; padding-top: 2px;">
-                                        🗑️
+                            <div style="display: flex; gap: 8px;">
+                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;" onsubmit="return confirm('Deseja apagar APENAS esta parcela?')">
+                                    <input type="hidden" name="tipo_exclusao" value="unica">
+                                    <button type="submit" style="background: #475569; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">
+                                        Apagar parcela
                                     </button>
                                 </form>
+                                
+                                {% if gasto.compra_id %}
+                                <form method="POST" action="/deletar_gasto/{{ gasto.id }}" style="margin: 0;" onsubmit="return confirm('Deseja apagar esta e TODAS AS PARCELAS FUTURAS desta compra?')">
+                                    <input type="hidden" name="tipo_exclusao" value="futuras">
+                                    <button type="submit" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">
+                                        Apagar série
+                                    </button>
+                                </form>
+                                {% endif %}
                             </div>
                         </div>
+                    </div>
                     {% else %}
-                        <div style="text-align: center; padding: 40px; color: var(--text-dim);">
-                            <p>Nenhum gasto encontrado no histórico de {{ meses[mes_atual] }} de {{ ano_atual }}.</p>
-                        </div>
+                    <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+                        <p>Nenhum gasto encontrado no histórico de {{ meses[mes_atual] }} de {{ ano_atual }}.</p>
+                    </div>
                     {% endfor %}
                 </div>
             </div>

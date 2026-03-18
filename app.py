@@ -1,4 +1,5 @@
 import os
+import uuid
 from datetime import datetime, date
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -26,7 +27,8 @@ class Gasto(db.Model):
     descricao = db.Column(db.String(200), nullable=False)
     valor = db.Column(db.Float, nullable=False)
     categoria = db.Column(db.String(50), default="Outros")
-    data = db.Column(db.DateTime, default=datetime.utcnow) 
+    data = db.Column(db.DateTime, default=datetime.utcnow)
+    compra_id = db.Column(db.String(50), nullable=True) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Economia(db.Model):
@@ -131,7 +133,7 @@ def dashboard():
             except ValueError:
                 data_ajustada = hoje.replace(year=ano_tela, month=mes_tela, day=28)
             
-            db.session.add(Gasto(descricao=desc, valor=valor, categoria=identificar_categoria(desc), user_id=current_user.id, data=data_ajustada))
+            db.session.add(Gasto(descricao=desc, valor=valor, categoria=identificar_categoria(desc), user_id=current_user.id, data=data_ajustada, compra_id=None))
             db.session.commit()
             
             return redirect(url_for('dashboard', mes=mes_tela, ano=ano_tela))
@@ -160,6 +162,8 @@ def lancamento_detalhado():
 
     data_inicial = datetime.strptime(data_texto, '%Y-%m-%d')
     valor_parcela = valor_total / parcelas
+    
+    novo_compra_id = uuid.uuid4().hex if parcelas > 1 else None
 
     for i in range(parcelas):
         desc_final = descricao if parcelas == 1 else f"{descricao} ({i+1}/{parcelas})"
@@ -171,6 +175,7 @@ def lancamento_detalhado():
             valor=valor_parcela,
             categoria=categoria,
             data=data_parcela,
+            compra_id=novo_compra_id,
             user_id=current_user.id
         )
         db.session.add(novo_gasto)
@@ -240,9 +245,16 @@ def economias():
 @app.route('/deletar_gasto/<int:id>', methods=['POST'])
 @login_required
 def deletar_gasto(id):
+    tipo_exclusao = request.form.get('tipo_exclusao', 'unica')
     gasto = Gasto.query.get(id)
+    
     if gasto and gasto.user_id == current_user.id:
-        db.session.delete(gasto); db.session.commit()
+        if tipo_exclusao == 'futuras' and gasto.compra_id:
+            Gasto.query.filter_by(user_id=current_user.id, compra_id=gasto.compra_id).filter(Gasto.data >= gasto.data).delete()
+        else:
+            db.session.delete(gasto)
+        db.session.commit()
+        
     return redirect(request.referrer or url_for('extrato'))
 
 @app.route('/logout')
