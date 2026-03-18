@@ -4,20 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a">
-    <title>10Conto - Criar Conta </title>
+    <title>10Conto - Criar Conta</title>
     <link rel="icon" href="{{ url_for('static', filename='logo.png', v='2') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png', v='2') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-    }
-</script>
 <body class="auth-body">
     <div class="auth-container">
-        
         <div class="auth-card">
             <div style="margin-bottom: 1.5rem; text-align: center;">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px;">
@@ -59,9 +53,13 @@
             </div>
         </div>
         <p style="text-align: center; color: var(--text-dim); opacity: 0.5; font-size: 0.75rem; margin-top: 1.5rem; letter-spacing: 0.5px;">
-            Desenvolvido por Milena Leal • Versão 2.5
+            Desenvolvido por Milena Leal • Versão 3.0
         </p>
-
     </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+        }
+    </script>
 </body>
 </html>

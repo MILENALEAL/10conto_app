@@ -10,14 +10,10 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-    }
-</script>
 <body class="auth-body">
     <div class="main-wrapper" style="display: block; padding: 20px;">
-        <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        <div class="auth-card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 15px;">
             <h1 style="color: var(--text-main); margin-bottom: 10px;">👑 Painel de Controle</h1>
             <p style="color: var(--text-dim); margin-bottom: 25px;">Gerenciamento de usuários e sistema.</p>
 
@@ -32,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="chat-container" style="background: rgba(0,0,0,0.2);">
+            <div class="chat-container" style="background: rgba(0,0,0,0.2); text-align: left;">
                 <h3 style="margin-bottom: 15px;">Lista de Usuários</h3>
                 {% for u in usuarios %}
                 <div style="display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -47,5 +43,10 @@
             </div>
         </div>
     </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+        }
+    </script>
 </body>
 </html>

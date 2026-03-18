@@ -4,25 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a">
-    <title>10Conto - Minhas Economias</title>
+    <title>10Conto - Dashboard</title>
     <link rel="icon" href="{{ url_for('static', filename='logo.png', v='2') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png', v='2') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-    }
-</script>
 <body>
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
-    <h2>10Conto</h2>
-    <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
-</div>
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
+                <h2>10Conto</h2>
+                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+            </div>
             <nav>
                 <a href="/dashboard" class="nav-link active">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
@@ -207,20 +202,20 @@
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
         }
-
         function abrirModal() {
             document.getElementById('modalDetalhado').style.display = 'flex';
             document.getElementById('data_compra').valueAsDate = new Date();
         }
-
         function fecharModal() {
             document.getElementById('modalDetalhado').style.display = 'none';
         }
-
         function preencherChat(palavra) {
             let campo = document.getElementById('campoChat');
             campo.value = palavra + " "; 
             campo.focus(); 
+        }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
         }
     </script>
 </body>

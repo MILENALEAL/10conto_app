@@ -10,20 +10,15 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-    }
-</script>
 <body>
 
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
-    <h2>10Conto</h2>
-    <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
-</div>
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
+                <h2>10Conto</h2>
+                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+            </div>
             <nav>
                 <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
@@ -40,7 +35,6 @@
 
         <main class="content">
             <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
-                
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
                     <div>
@@ -116,6 +110,10 @@
 
     <script>
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+        }
     </script>
 </body>
 </html>

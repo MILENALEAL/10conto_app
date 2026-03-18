@@ -4,17 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a">
-    <title>10Conto - Extrato </title>
+    <title>10Conto - Extrato</title>
     <link rel="icon" href="{{ url_for('static', filename='logo.png', v='2') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png', v='2') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-    }
-</script>
 <body>
 
     <div class="main-wrapper">
@@ -145,6 +140,9 @@
 
     <script>
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+        }
     </script>
 </body>
 </html>
