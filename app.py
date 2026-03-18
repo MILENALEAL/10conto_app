@@ -1,9 +1,10 @@
 import os
-from datetime import datetime
+from datetime import datetime, date
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from sqlalchemy import func, extract
+from dateutil.relativedelta import relativedelta 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'uma-chave-muito-segura'
@@ -102,20 +103,61 @@ def dashboard():
     
     if request.method == 'POST':
         mensagem = request.form.get('mensagem')
+        mes_tela = int(request.form.get('mes_tela', datetime.now().month))
+        
         try:
             partes = mensagem.rsplit(' ', 1)
             desc = partes[0]
             valor = float(partes[1].replace(',', '.'))
             
-            db.session.add(Gasto(descricao=desc, valor=valor, categoria=identificar_categoria(desc), user_id=current_user.id))
+            hoje = datetime.now()
+            try:
+                data_ajustada = hoje.replace(month=mes_tela)
+            except ValueError:
+                data_ajustada = hoje.replace(month=mes_tela, day=28)
+            
+            db.session.add(Gasto(descricao=desc, valor=valor, categoria=identificar_categoria(desc), user_id=current_user.id, data=data_ajustada))
             db.session.commit()
-            return redirect(url_for('dashboard'))
+            
+            return redirect(url_for('dashboard', mes=mes_tela))
         except:
             flash('Erro! Digite: Descrição Valor (Ex: Pizza 50)')
             
-    gastos = Gasto.query.filter_by(user_id=current_user.id).filter(extract('month', Gasto.data) == mes_selecionado).all()
+    gastos = Gasto.query.filter_by(user_id=current_user.id).filter(extract('month', Gasto.data) == mes_selecionado).order_by(Gasto.data.desc()).all()
     total = sum(g.valor for g in gastos)
     return render_template('dashboard.html', gastos=gastos, total=total, mes_atual=mes_selecionado, meses=MESES_NOME)
+
+
+@app.route('/lancamento_detalhado', methods=['POST'])
+@login_required
+def lancamento_detalhado():
+    descricao = request.form.get('descricao')
+    valor_total = float(request.form.get('valor').replace(',', '.'))
+    categoria = request.form.get('categoria')
+    data_texto = request.form.get('data_compra')
+    parcelas = int(request.form.get('parcelas'))
+
+    data_inicial = datetime.strptime(data_texto, '%Y-%m-%d')
+    valor_parcela = valor_total / parcelas
+
+    for i in range(parcelas):
+        desc_final = descricao if parcelas == 1 else f"{descricao} ({i+1}/{parcelas})"
+        
+        data_parcela = data_inicial + relativedelta(months=i)
+
+        novo_gasto = Gasto(
+            descricao=desc_final,
+            valor=valor_parcela,
+            categoria=categoria,
+            data=data_parcela,
+            user_id=current_user.id
+        )
+        db.session.add(novo_gasto)
+
+    db.session.commit()
+    
+    return redirect(url_for('dashboard', mes=data_inicial.month))
+
 
 @app.route('/extrato', methods=['GET', 'POST'])
 @login_required

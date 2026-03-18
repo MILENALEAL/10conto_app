@@ -4,19 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10Conto - Minhas Metas</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header"><h2>💰 10Conto</h2></div>
+            <div class="sidebar-header">
+                <h2>💰 10Conto</h2>
+                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+            </div>
             <nav>
                 <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
                 <a href="/tabelas" class="nav-link">📊 Tabelas por Categoria</a>
                 <a href="/economias" class="nav-link active">🏦 Minhas Economias</a>
+                {% if current_user.username == 'Milena' %}
+                <a href="/admin_painel" class="nav-link" style="color: var(--accent); border-left: 3px solid var(--accent);">👑 Painel Admin</a> 
+                {% endif %}
                 <div class="sidebar-footer">
                     <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
                 </div>
@@ -24,9 +31,17 @@
         </aside>
 
         <main class="content">
-            <header class="content-header">
-                <h1>Minha Economias</h1>
-                <div class="total-card eco-card">
+            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                    <div>
+                        <h1 style="margin-bottom: 5px;">Minhas Economias</h1>
+                        <p style="color: var(--text-dim); margin-bottom: 0;">Acompanhe o seu progresso</p>
+                    </div>
+                </div>
+
+                <div class="total-card eco-card" style="margin: 0; min-width: 250px;">
                     <span>Saldo Total Guardado</span>
                     <h2 class="valor-gasto">R$ {{ "%.2f"|format(total_economias) }}</h2>
                 </div>
@@ -36,7 +51,7 @@
             <div class="chat-container" style="margin-bottom: 20px; border-left: 5px solid var(--success);">
                 <h3 style="margin-bottom: 15px;">📥 Guardar Dinheiro</h3>
                 <form method="POST" class="input-group">
-                    <select name="meta_id" style="flex: 1; background: #334155; color: white; border: 1px solid #475569; padding: 10px; border-radius: 12px;">
+                    <select name="meta_id" style="flex: 1; background: #334155; color: white; border: 1px solid #475569; padding: 10px; border-radius: 12px; outline: none; cursor: pointer;">
                         {% for eco in economias %}
                             <option value="{{ eco.id }}">{{ eco.descricao }}</option>
                         {% endfor %}
@@ -60,8 +75,8 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <form method="POST" action="/deletar_economia/{{ eco.id }}">
-                                <button type="submit" class="btn-delete">🗑️</button>
+                            <form method="POST" action="/deletar_economia/{{ eco.id }}" onsubmit="return confirm('Tem certeza que deseja apagar esta meta?')">
+                                <button type="submit" class="btn-delete" style="background: none; border: none; cursor: pointer; font-size: 1.2rem;">🗑️</button>
                             </form>
                         </div>
 
@@ -84,7 +99,7 @@
                 <h3 style="margin-bottom: 15px; color: var(--accent);">🎯 Novo Objetivo</h3>
                 <form method="POST" style="display: flex; gap: 10px; flex-direction: column;">
                     <input type="text" name="nome_meta" placeholder="Nome (Ex: Viagem)" required>
-                    <input type="text" name="valor_meta" placeholder="Valor da Meta (Ex: 5000)" required>
+                    <input type="number" step="0.01" name="valor_meta" placeholder="Valor da Meta (Ex: 5000)" required>
                     <button type="submit" name="btn_criar" class="btn-enviar" style="width: 100%; padding: 12px;">Criar Meta</button>
                 </form>
             </div>

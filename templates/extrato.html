@@ -4,21 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10Conto - Extrato</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2>💰 10Conto</h2>
+                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
             </div>
             <nav>
                 <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link active">📋 Extrato de Gastos</a>
                 <a href="/tabelas" class="nav-link">📊 Tabelas por Categoria</a>
                 <a href="/economias" class="nav-link">🏦 Minhas Economias</a>
+                {% if current_user.username == 'Milena' %}
+                <a href="/admin_painel" class="nav-link" style="color: var(--accent); border-left: 3px solid var(--accent);">👑 Painel Admin</a> 
+                {% endif %}
                 <div class="sidebar-footer">
                     <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
                 </div>
@@ -27,12 +32,17 @@
 
         <main class="content">
             <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h1 style="margin-bottom: 5px;">Extrato Detalhado</h1>
-                    <p style="color: var(--text-dim); margin-bottom: 25px;">Gerencie seus lançamentos do mês</p>
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                    <div>
+                        <h1 style="margin-bottom: 5px;">Extrato Detalhado</h1>
+                        <p style="color: var(--text-dim); margin-bottom: 15px;">Gerencie seus lançamentos do mês</p>
+                    </div>
                 </div>
 
-<form method="GET" action="/extrato" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px;">                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
+                <form method="GET" action="/extrato" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px;">                    
+                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
                     <select name="mes" id="mes" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer; padding-right: 5px;">
                         {% for num, nome in meses.items() %}
                             <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %} style="background: #1e293b; color: white;">
@@ -61,7 +71,7 @@
                     <small style="color: var(--text-dim);">{{ "%.0f"|format(porcentagem) }}% consumido</small>
                     
                     <form method="POST" style="display: flex; gap: 5px;">
-                        <input type="number" name="nova_meta" placeholder="Mudar limite" required style="padding: 4px 8px; font-size: 0.8rem; width: 120px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px;">
+                        <input type="number" name="nova_meta" placeholder="Mudar limite" required style="padding: 4px 8px; font-size: 0.8rem; width: 120px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; margin-bottom: 0 !important;">
                         <button type="submit" class="btn-enviar" style="padding: 4px 10px; font-size: 0.8rem;">Salvar</button>
                     </form>
                 </div>

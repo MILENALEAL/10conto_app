@@ -4,23 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10Conto - Dashboard</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>💰 10Conto</h2>
-            </div>
+    <h2>💰 10Conto</h2>
+    <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+</div>
             <nav>
                 <a href="/dashboard" class="nav-link active">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
                 <a href="/tabelas" class="nav-link">📊 Tabelas por Categoria</a> 
                 <a href="/economias" class="nav-link">🏦 Minhas Economias</a>
                 {% if current_user.username == 'Milena' %}
-                <a href="/admin_painel" class="nav-link" style="color: var(--accent); border-left: 3px solid var(--accent);">👑 Painel Admin</a> {% endif %}
+                <a href="/admin_painel" class="nav-link" style="color: var(--accent); border-left: 3px solid var(--accent);">👑 Painel Admin</a> 
+                {% endif %}
                 <div class="sidebar-footer">
                     <a href="/logout" class="nav-link btn-sair">🚪 Sair da Conta</a>
                 </div>
@@ -29,9 +31,13 @@
 
         <main class="content">
             <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h1 style="margin-bottom: 5px;">Olá, {{ current_user.username }}!</h1>
-                    <p style="color: var(--text-dim); margin-bottom: 25px;">O que você gastou hoje?</p>
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                    <div>
+                        <h1 style="margin-bottom: 5px;">Olá, {{ current_user.username }}!</h1>
+                        <p style="color: var(--text-dim); margin-bottom: 10px;">O que você gastou hoje?</p>
+                    </div>
                 </div>
 
                 <form method="GET" action="/dashboard" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
@@ -66,38 +72,120 @@
                 </div>
 
                 <form method="POST" action="/dashboard" class="input-group">
-                    <input type="text" name="mensagem" placeholder="Ex: Mercado 150,00" required autocomplete="off">
-                    <button type="submit" class="btn-enviar">Enviar</button>
+                <input type="hidden" name="mes_tela" value="{{ mes_atual }}">
+                <input type="text" id="campoChat" name="mensagem" placeholder="Ex: Mercado 150,00" required autocomplete="off">
+                <button type="submit" class="btn-enviar">Enviar</button>
                 </form>
+
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="abrirModal()" type="button" style="background: transparent; border: 1px dashed var(--accent); color: var(--accent); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.3s; width: 100%;">
+                        + Lançamento Detalhado
+                    </button>
+                </div>
 
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
                         <div style="margin-top: 15px;">
                         {% for message in messages %}
-                            <p style="color: var(--danger); font-size: 0.9rem;">{{ message }}</p>
+                            <p style="color: var(--danger); font-size: 0.9rem; text-align: center;">{{ message }}</p>
                         {% endfor %}
                         </div>
                     {% endif %}
                 {% endwith %}
 
                 <div class="categoria-guia" style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 20px;">Categorias sugeridas:</h3>
+                    <h3 style="margin-bottom: 20px;">Categorias Selecionáveis </h3>
                     <div class="tags">
-                        <span class="tag">🍔 Alimentação</span>
-                        <span class="tag">🚗 Transporte</span>
-                        <span class="tag">🏠 Casa</span>
-                        <span class="tag">🎉 Lazer</span>
-                        <span class="tag">🍿 Assinaturas</span>
-                        <span class="tag">💡 Outros</span>
+                        <span class="tag" style="cursor: pointer;" onclick="preencherChat('Alimentação')">🍔 Alimentação</span>
+                        <span class="tag" style="cursor: pointer;" onclick="preencherChat('Transporte')">🚗 Transporte</span>
+                        <span class="tag" style="cursor: pointer;" onclick="preencherChat('Casa')">🏠 Casa</span>
+                        <span class="tag" style="cursor: pointer;" onclick="preencherChat('Lazer')">🎉 Lazer</span>
+                        <span class="tag" style="cursor: pointer;" onclick="preencherChat('Assinaturas')">🍿 Assinaturas</span>
+                        <span class="tag" style="cursor: pointer;" onclick="preencherChat('Outros')">💡 Outros</span>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <div id="modalDetalhado" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #1e293b; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--text-main); font-size: 1.2rem; margin: 0;">📝 Novo Lançamento</h2>
+                <button onclick="fecharModal()" type="button" style="background: none; border: none; color: var(--text-dim); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <form method="POST" action="/lancamento_detalhado" style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px; display: block;">O que você comprou?</label>
+                    <input type="text" name="descricao" required placeholder="Ex: Tênis novo" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none;">
+                </div>
+
+                <div>
+                    <label style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px; display: block;">Valor Total (R$)</label>
+                    <input type="number" step="0.01" name="valor" required placeholder="Ex: 150.00" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none;">
+                </div>
+
+                <div>
+                    <label style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px; display: block;">Categoria</label>
+                    <select name="categoria" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; cursor: pointer;">
+                        <option value="Alimentação" style="background: #1e293b;">🍔 Alimentação</option>
+                        <option value="Transporte" style="background: #1e293b;">🚗 Transporte</option>
+                        <option value="Casa" style="background: #1e293b;">🏠 Casa</option>
+                        <option value="Lazer" style="background: #1e293b;">🎉 Lazer</option>
+                        <option value="Assinaturas" style="background: #1e293b;">🍿 Assinaturas</option>
+                        <option value="Outros" style="background: #1e293b;">💡 Outros</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px; display: block;">Data da Compra</label>
+                        <input type="date" name="data_compra" id="data_compra" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; color-scheme: dark;">
+                    </div>
+
+                    <div>
+                        <label style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px; display: block;">Parcelas</label>
+                        <select name="parcelas" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; cursor: pointer;">
+                            <option value="1" style="background: #1e293b;">À vista (1x)</option>
+                            <option value="2" style="background: #1e293b;">2x</option>
+                            <option value="3" style="background: #1e293b;">3x</option>
+                            <option value="4" style="background: #1e293b;">4x</option>
+                            <option value="5" style="background: #1e293b;">5x</option>
+                            <option value="6" style="background: #1e293b;">6x</option>
+                            <option value="7" style="background: #1e293b;">7x</option>
+                            <option value="8" style="background: #1e293b;">8x</option>
+                            <option value="9" style="background: #1e293b;">9x</option>
+                            <option value="10" style="background: #1e293b;">10x</option>
+                            <option value="11" style="background: #1e293b;">11x</option>
+                            <option value="12" style="background: #1e293b;">12x</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-enviar" style="margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%;">Salvar Lançamento</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function abrirModal() {
+            document.getElementById('modalDetalhado').style.display = 'flex';
+            document.getElementById('data_compra').valueAsDate = new Date();
+        }
+
+        function fecharModal() {
+            document.getElementById('modalDetalhado').style.display = 'none';
+        }
+
+        function preencherChat(palavra) {
+            let campo = document.getElementById('campoChat');
+            campo.value = palavra + " "; 
+            campo.focus(); 
         }
     </script>
 </body>

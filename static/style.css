@@ -67,14 +67,69 @@ body {
 input { width: 100%; background: #334155; border: 1px solid #475569; color: white; padding: 14px; border-radius: 12px; outline: none; }
 .btn-enviar { background: var(--accent); color: white; border: none; padding: 0 24px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
-.menu-toggle { display: none; position: fixed; top: 20px; left: 20px; z-index: 1000; background: var(--accent); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; }
-@media (max-width: 768px) {
-    .menu-toggle { display: block; }
-    .sidebar { position: fixed; left: -100%; top: 0; z-index: 999; height: 100vh; }
-    .sidebar.active { left: 0; }
-    .content { padding-top: 5rem; }
+.menu-toggle {
+    display: none; 
+    background: var(--accent);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.2rem;
 }
 
 .categoria-guia { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag { background: #334155; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1); }
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0; 
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -100%; 
+        height: 100vh;
+        z-index: 1000; 
+    }
+
+    .sidebar.active {
+        left: 0; 
+        box-shadow: 10px 0 20px rgba(0,0,0,0.5);
+    }
+    
+    .total-card {
+        margin-top: 10px;
+    }
+}
+
+/* --- BOTÃO DE FECHAR O MENU --- */
+.btn-fechar {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 2.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .btn-fechar {
+        display: block; /* Mostra o X no celular */
+    }
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    .sidebar-header h2 {
+        margin-bottom: 0; /* Tira a margem para o X não ficar torto */
+    }
+}

@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\milena.leal\Desktop\AppMilena\meu_app_financas\venv"
+set "VIRTUAL_ENV=C:\meu_app_financas\venv"
 
 if not defined PROMPT set PROMPT=$P$G
 
