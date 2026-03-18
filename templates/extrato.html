@@ -10,11 +10,13 @@
 </head>
 <body>
 
-    <div class="sidebar-header">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
-    <h2>10Conto</h2>
-    <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
-</div>
+    <div class="main-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
+                <h2>10Conto</h2>
+                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+            </div>
             <nav>
                 <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link active">📋 Extrato de Gastos</a>
@@ -31,7 +33,6 @@
 
         <main class="content">
             <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
                     <div>
