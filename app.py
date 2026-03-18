@@ -60,11 +60,25 @@ MESES_NOME = {
     9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
 }
 
-def obter_mes_selecionado():
+def obter_mes_ano_selecionado():
     mes = request.args.get('mes')
-    if mes and mes.isdigit() and 1 <= int(mes) <= 12:
-        return int(mes)
-    return datetime.now().month
+    ano = request.args.get('ano')
+    
+    if not mes or not mes.isdigit() or not (1 <= int(mes) <= 12):
+        mes = datetime.now().month
+    else:
+        mes = int(mes)
+        
+    if not ano or not ano.isdigit():
+        ano = datetime.now().year
+    else:
+        ano = int(ano)
+        
+    return mes, ano
+
+def obter_anos_disponiveis():
+    ano_atual = datetime.now().year
+    return [ano_atual - 1, ano_atual, ano_atual + 1, ano_atual + 2]
 
 @app.route('/')
 def index():
@@ -99,11 +113,12 @@ def registro():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    mes_selecionado = obter_mes_selecionado()
+    mes_selecionado, ano_selecionado = obter_mes_ano_selecionado()
     
     if request.method == 'POST':
         mensagem = request.form.get('mensagem')
         mes_tela = int(request.form.get('mes_tela', datetime.now().month))
+        ano_tela = int(request.form.get('ano_tela', datetime.now().year))
         
         try:
             partes = mensagem.rsplit(' ', 1)
@@ -112,20 +127,26 @@ def dashboard():
             
             hoje = datetime.now()
             try:
-                data_ajustada = hoje.replace(month=mes_tela)
+                data_ajustada = hoje.replace(year=ano_tela, month=mes_tela)
             except ValueError:
-                data_ajustada = hoje.replace(month=mes_tela, day=28)
+                data_ajustada = hoje.replace(year=ano_tela, month=mes_tela, day=28)
             
             db.session.add(Gasto(descricao=desc, valor=valor, categoria=identificar_categoria(desc), user_id=current_user.id, data=data_ajustada))
             db.session.commit()
             
-            return redirect(url_for('dashboard', mes=mes_tela))
+            return redirect(url_for('dashboard', mes=mes_tela, ano=ano_tela))
         except:
             flash('Erro! Digite: Descrição Valor (Ex: Pizza 50)')
             
-    gastos = Gasto.query.filter_by(user_id=current_user.id).filter(extract('month', Gasto.data) == mes_selecionado).order_by(Gasto.data.desc()).all()
+    gastos = Gasto.query.filter_by(user_id=current_user.id)\
+        .filter(extract('month', Gasto.data) == mes_selecionado)\
+        .filter(extract('year', Gasto.data) == ano_selecionado)\
+        .order_by(Gasto.data.desc()).all()
+        
     total = sum(g.valor for g in gastos)
-    return render_template('dashboard.html', gastos=gastos, total=total, mes_atual=mes_selecionado, meses=MESES_NOME)
+    anos = obter_anos_disponiveis()
+    
+    return render_template('dashboard.html', gastos=gastos, total=total, mes_atual=mes_selecionado, ano_atual=ano_selecionado, meses=MESES_NOME, anos=anos)
 
 
 @app.route('/lancamento_detalhado', methods=['POST'])
@@ -156,31 +177,45 @@ def lancamento_detalhado():
 
     db.session.commit()
     
-    return redirect(url_for('dashboard', mes=data_inicial.month))
+    return redirect(url_for('dashboard', mes=data_inicial.month, ano=data_inicial.year))
 
 
 @app.route('/extrato', methods=['GET', 'POST'])
 @login_required
 def extrato():
-    mes_selecionado = obter_mes_selecionado()
+    mes_selecionado, ano_selecionado = obter_mes_ano_selecionado()
     
     if request.method == 'POST' and 'nova_meta' in request.form:
         current_user.meta_mensal = float(request.form.get('nova_meta'))
         db.session.commit()
         
-    gastos = Gasto.query.filter_by(user_id=current_user.id).filter(extract('month', Gasto.data) == mes_selecionado).order_by(Gasto.data.desc()).all()
+    gastos = Gasto.query.filter_by(user_id=current_user.id)\
+        .filter(extract('month', Gasto.data) == mes_selecionado)\
+        .filter(extract('year', Gasto.data) == ano_selecionado)\
+        .order_by(Gasto.data.desc()).all()
+        
     total = sum(g.valor for g in gastos)
     porcentagem = (total / current_user.meta_mensal * 100) if current_user.meta_mensal > 0 else 0
-    return render_template('extrato.html', gastos=gastos, total=total, porcentagem=min(porcentagem, 100), meta=current_user.meta_mensal, mes_atual=mes_selecionado, meses=MESES_NOME)
+    anos = obter_anos_disponiveis()
+    
+    return render_template('extrato.html', gastos=gastos, total=total, porcentagem=min(porcentagem, 100), meta=current_user.meta_mensal, mes_atual=mes_selecionado, ano_atual=ano_selecionado, meses=MESES_NOME, anos=anos)
 
 @app.route('/tabelas')
 @login_required
 def tabelas():
-    mes_selecionado = obter_mes_selecionado()
-    resumo = db.session.query(Gasto.categoria, func.sum(Gasto.valor)).filter_by(user_id=current_user.id).filter(extract('month', Gasto.data) == mes_selecionado).group_by(Gasto.categoria).all()
+    mes_selecionado, ano_selecionado = obter_mes_ano_selecionado()
+    
+    resumo = db.session.query(Gasto.categoria, func.sum(Gasto.valor))\
+        .filter_by(user_id=current_user.id)\
+        .filter(extract('month', Gasto.data) == mes_selecionado)\
+        .filter(extract('year', Gasto.data) == ano_selecionado)\
+        .group_by(Gasto.categoria).all()
+        
     labels = [r[0] for r in resumo]
     valores = [float(r[1]) for r in resumo]
-    return render_template('tabelas.html', resumo=resumo, labels=labels, valores=valores, mes_atual=mes_selecionado, meses=MESES_NOME)
+    anos = obter_anos_disponiveis()
+    
+    return render_template('tabelas.html', resumo=resumo, labels=labels, valores=valores, mes_atual=mes_selecionado, ano_atual=ano_selecionado, meses=MESES_NOME, anos=anos)
 
 @app.route('/economias', methods=['GET', 'POST'])
 @login_required

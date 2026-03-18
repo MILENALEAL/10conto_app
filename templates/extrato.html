@@ -42,11 +42,18 @@
                 </div>
 
                 <form method="GET" action="/extrato" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px;">                    
-                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
+                    <label style="color: var(--text-dim); font-size: 0.9rem;">Período:</label>
                     <select name="mes" id="mes" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer; padding-right: 5px;">
                         {% for num, nome in meses.items() %}
                             <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %} style="background: #1e293b; color: white;">
                                 {{ nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <select name="ano" id="ano" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer;">
+                        {% for ano in anos %}
+                            <option value="{{ ano }}" {% if ano == ano_atual %}selected{% endif %} style="background: #1e293b; color: white;">
+                                {{ ano }}
                             </option>
                         {% endfor %}
                     </select>
@@ -98,7 +105,7 @@
                         </div>
                     {% else %}
                         <div style="text-align: center; padding: 40px; color: var(--text-dim);">
-                            <p>Nenhum gasto encontrado no histórico de {{ meses[mes_atual] }}.</p>
+                            <p>Nenhum gasto encontrado no histórico de {{ meses[mes_atual] }} de {{ ano_atual }}.</p>
                         </div>
                     {% endfor %}
                 </div>

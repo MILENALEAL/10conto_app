@@ -12,9 +12,9 @@
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-    <h2>💰 10Conto</h2>
-    <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
-</div>
+                <h2>💰 10Conto</h2>
+                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+            </div>
             <nav>
                 <a href="/dashboard" class="nav-link active">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
@@ -41,7 +41,7 @@
                 </div>
 
                 <form method="GET" action="/dashboard" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <label for="mes" style="color: var(--text-dim); font-size: 0.9rem;">Mês:</label>
+                    <label style="color: var(--text-dim); font-size: 0.9rem;">Período:</label>
                     <select name="mes" id="mes" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer; padding-right: 5px;">
                         {% for num, nome in meses.items() %}
                             <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %} style="background: #1e293b; color: white;">
@@ -49,10 +49,17 @@
                             </option>
                         {% endfor %}
                     </select>
+                    <select name="ano" id="ano" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text-main); font-weight: bold; outline: none; cursor: pointer;">
+                        {% for ano in anos %}
+                            <option value="{{ ano }}" {% if ano == ano_atual %}selected{% endif %} style="background: #1e293b; color: white;">
+                                {{ ano }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </form>
 
                 <div class="total-card" style="width: 100%;">
-                    <span>Total Gasto em {{ meses[mes_atual] }}</span>
+                    <span>Total Gasto em {{ meses[mes_atual] }} de {{ ano_atual }}</span>
                     <h2 class="valor-gasto">R$ {{ "%.2f"|format(total) }}</h2>
                 </div>
             </header>
@@ -66,15 +73,16 @@
                         </div>
                     {% else %}
                         <div class="empty-state" style="text-align: center; padding-top: 100px; color: var(--text-dim);">
-                            <p>Nenhum gasto registrado em {{ meses[mes_atual] }}.<br>Tente digitar: "Lanche 20,00"</p>
+                            <p>Nenhum gasto registrado em {{ meses[mes_atual] }} de {{ ano_atual }}.<br>Tente digitar: "Lanche 20,00"</p>
                         </div>
                     {% endfor %}
                 </div>
 
                 <form method="POST" action="/dashboard" class="input-group">
-                <input type="hidden" name="mes_tela" value="{{ mes_atual }}">
-                <input type="text" id="campoChat" name="mensagem" placeholder="Ex: Mercado 150,00" required autocomplete="off">
-                <button type="submit" class="btn-enviar">Enviar</button>
+                    <input type="hidden" name="mes_tela" value="{{ mes_atual }}">
+                    <input type="hidden" name="ano_tela" value="{{ ano_atual }}">
+                    <input type="text" id="campoChat" name="mensagem" placeholder="Ex: Mercado 150,00" required autocomplete="off">
+                    <button type="submit" class="btn-enviar">Enviar</button>
                 </form>
 
                 <div style="text-align: center; margin-top: 15px;">
@@ -94,7 +102,7 @@
                 {% endwith %}
 
                 <div class="categoria-guia" style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 20px;">Categorias Selecionáveis </h3>
+                    <h3 style="margin-bottom: 20px;">Categorias Selecionáveis</h3>
                     <div class="tags">
                         <span class="tag" style="cursor: pointer;" onclick="preencherChat('Alimentação')">🍔 Alimentação</span>
                         <span class="tag" style="cursor: pointer;" onclick="preencherChat('Transporte')">🚗 Transporte</span>
