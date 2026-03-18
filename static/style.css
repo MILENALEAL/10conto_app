@@ -148,7 +148,7 @@ input { width: 100%; background: #334155; border: 1px solid #475569; color: whit
 }
 
 .content {
-    padding-top: calc(env(safe-area-inset-top) + 20px) !important;
+    padding-top: calc(env(safe-area-inset-top) + 40px) !important;
 }
 
 .sidebar {
