@@ -13,9 +13,10 @@
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>💰 10Conto</h2>
-                <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
-            </div>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-sidebar">
+    <h2>10Conto</h2>
+    <button class="btn-fechar" onclick="toggleMenu()">&times;</button>
+</div>
             <nav>
                 <a href="/dashboard" class="nav-link">💬 Chat de Lançamento</a>
                 <a href="/extrato" class="nav-link">📋 Extrato de Gastos</a>
